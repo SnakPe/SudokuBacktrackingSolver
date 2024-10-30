@@ -1,0 +1,24 @@
+#Sudoku{
+    display: inline-block;
+    border: 0.5px solid black;
+}
+.Row{
+    display: block;
+}
+.Cell{
+    vertical-align: top;
+    display : inline-block;
+    text-align: center;
+    border  : 0.5px solid black;
+    width   : 20px;
+    height  : 20px;
+
+}
+.Cell::-webkit-inner-spin-button,
+.Cell::-webkit-outer-spin-button{
+    -webkit-appearance: none;
+    margin: 0;
+}
+.Cell[type=number]{
+    -moz-appearance: textfield;
+}
