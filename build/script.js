@@ -112,7 +112,12 @@ onload = () => {
         slider.max = (pathToSolution.length - 1).toString();
     });
     function handleSliderChange(e) {
-        sudoku.replaceChildren(...getSudokuDOM(pathToSolution[Number(this.value)]).childNodes.values());
+        sudoku.childNodes.forEach((row, rowIndex) => {
+            row.childNodes.forEach((cell, columnIndex) => {
+                let currentCell = pathToSolution[Number(this.value)][rowIndex][columnIndex];
+                cell.value = currentCell == null ? "" : currentCell.toString();
+            });
+        });
     }
     slider.addEventListener("change", handleSliderChange);
 };

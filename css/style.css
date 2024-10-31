@@ -10,9 +10,9 @@
     display : inline-block;
     text-align: center;
     border  : 0.5px solid black;
-    width   : 20px;
-    height  : 20px;
-
+    width     : 5vh;
+    height    : 5vh;
+    font-size: 5vh;
 }
 .Cell::-webkit-inner-spin-button,
 .Cell::-webkit-outer-spin-button{
@@ -21,4 +21,12 @@
 }
 .Cell[type=number]{
     -moz-appearance: textfield;
+}
+
+button,
+#Control{
+    font-size: 2.5vh;
+}
+#Control{
+    margin-top: 5px;
 }
