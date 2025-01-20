@@ -25,6 +25,7 @@ function solve(grid) {
     }
     if (nextEmptyCellPosition == undefined)
         return true;
+    pathToSolution.push(grid);
     for (const value of values) {
         if (!checkNewValue(grid, value, nextEmptyCellPosition))
             continue;
@@ -78,6 +79,7 @@ function getSudokuDOM(grid) {
         rowDom.className = "Row";
         row.map((cell, columnIndex) => {
             const cellDom = document.createElement("input");
+            cellDom.name = "Cell";
             cellDom.type = "number";
             cellDom.max = "9";
             cellDom.min = "1";
@@ -95,7 +97,25 @@ onload = () => {
     const sudoku = document.getElementById("Sudoku");
     const slider = document.getElementById("SolutionIteratorSelector");
     sudoku.replaceChildren(...getSudokuDOM(grid).childNodes.values());
-    solveButton.addEventListener("click", () => {
+    let intervalID = 0;
+    function handleAnimation() {
+        let i = 0;
+        clearInterval(intervalID);
+        function showNext() {
+            if (i >= pathToSolution.length) {
+                clearInterval(intervalID);
+                return;
+            }
+            document.getElementById("Sudoku")?.replaceChildren(...getSudokuDOM(pathToSolution[i]).childNodes.values());
+            i++;
+        }
+        const timeInMillis = document.getElementById("AnimationSpeedSelector").valueAsNumber;
+        intervalID = setInterval(() => showNext(), timeInMillis);
+    }
+    document.getElementById("SolveAnimator").addEventListener("click", () => handleAnimation());
+    document.getElementById("AnimationStoper").addEventListener("click", () => clearInterval(intervalID));
+    function handleSolve() {
+        clearInterval(intervalID);
         pathToSolution = [];
         let rowIndex = 0;
         let columnIndex = 0;
@@ -108,29 +128,22 @@ onload = () => {
             columnIndex = 0;
             rowIndex++;
         });
-        solve(grid);
+        if (!solve(grid))
+            alert("Sudoku is not solvable");
         slider.max = (pathToSolution.length - 1).toString();
-    });
-    function handleSliderChange(e) {
+        showSudokuOfPath(0);
+    }
+    solveButton.addEventListener("click", () => handleSolve());
+    function showSudokuOfPath(iteration) {
         sudoku.childNodes.forEach((row, rowIndex) => {
             row.childNodes.forEach((cell, columnIndex) => {
-                let currentCell = pathToSolution[Number(this.value)][rowIndex][columnIndex];
+                let currentCell = pathToSolution[iteration][rowIndex][columnIndex];
                 cell.value = currentCell == null ? "" : currentCell.toString();
             });
         });
     }
+    function handleSliderChange(e) {
+        showSudokuOfPath(Number(this.value));
+    }
     slider.addEventListener("change", handleSliderChange);
 };
-function goThrough(timeInMillis) {
-    let i = 0;
-    let intervalID = 0;
-    function showNext() {
-        if (i >= pathToSolution.length) {
-            clearInterval(intervalID);
-            return;
-        }
-        document.getElementById("Sudoku")?.replaceChildren(...getSudokuDOM(pathToSolution[i]).childNodes.values());
-        i++;
-    }
-    intervalID = setInterval(() => showNext(), timeInMillis);
-}

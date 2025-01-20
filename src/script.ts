@@ -1,6 +1,6 @@
 /*
     Sudoku Solver
-    Copyright (C) 2024  Andreas Kovalski
+    Copyright (C) 2024 Andreas Kovalski
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,6 +53,8 @@ let pathToSolution : Grid[] = []
  */
 function solve(grid : Grid) : boolean{
     let nextEmptyCellPosition : Position | undefined = undefined
+
+    //initialize list of all empty cells
     outer : for(const y of coords){
         for(const x of coords){
             if(grid[y][x] == null){
@@ -63,7 +65,7 @@ function solve(grid : Grid) : boolean{
     }
 
     if(nextEmptyCellPosition == undefined)return true
-
+    pathToSolution.push(grid)
     for(const value of values){
         if(!checkNewValue(grid,value,nextEmptyCellPosition))continue
 
@@ -151,6 +153,7 @@ function getSudokuDOM(grid : Grid) : HTMLDivElement{
         rowDom.className = "Row"
         row.map((cell, columnIndex) => {
             const cellDom = document.createElement("input")
+            cellDom.name = "Cell"
             cellDom.type = "number"
             cellDom.max = "9"
             cellDom.min = "1"
@@ -165,13 +168,34 @@ function getSudokuDOM(grid : Grid) : HTMLDivElement{
     })
     return sudokuDom
 }
-
 onload = () => {
     const solveButton = document.getElementById("SudokuSolver")!
     const sudoku = document.getElementById("Sudoku")! 
     const slider = document.getElementById("SolutionIteratorSelector")! as HTMLInputElement
     sudoku.replaceChildren(...getSudokuDOM(grid).childNodes.values())
-    solveButton.addEventListener("click",() => {
+    
+
+    let intervalID = 0
+    function handleAnimation(){
+        let i = 0
+        clearInterval(intervalID)
+        function showNext(){
+            if(i >= pathToSolution.length){
+                clearInterval(intervalID)
+                return
+            }
+            document.getElementById("Sudoku")?.replaceChildren(...getSudokuDOM(pathToSolution[i]).childNodes.values())
+            i++
+        }
+        const timeInMillis = (document.getElementById("AnimationSpeedSelector")! as HTMLInputElement).valueAsNumber
+        intervalID = setInterval(() => showNext(),timeInMillis)
+    }
+    document.getElementById("SolveAnimator")!.addEventListener("click", () => handleAnimation())
+    document.getElementById("AnimationStoper")!.addEventListener("click", () => clearInterval(intervalID))
+
+
+    function handleSolve(){
+        clearInterval(intervalID)
         pathToSolution = []
         let rowIndex = 0
         let columnIndex = 0
@@ -184,32 +208,24 @@ onload = () => {
             columnIndex = 0
             rowIndex++
         })
-        solve(grid)
+        if(!solve(grid))alert("Sudoku is not solvable")
         slider.max = (pathToSolution.length-1).toString()
-    });
+        showSudokuOfPath(0)
+    }
+    solveButton.addEventListener("click",() => handleSolve());
 
-    function handleSliderChange(this: HTMLInputElement, e : Event){
+    function showSudokuOfPath(iteration : number){
         sudoku.childNodes.forEach((row,rowIndex) => {
             row.childNodes.forEach((cell, columnIndex) => {
-                let currentCell : Cell = pathToSolution[Number(this.value)][rowIndex][columnIndex];
+                let currentCell : Cell = pathToSolution[iteration][rowIndex][columnIndex];
                 (cell as HTMLInputElement).value = currentCell == null ? "" : currentCell.toString() 
             })
         })
     }
+    function handleSliderChange(this: HTMLInputElement, e : Event){
+        showSudokuOfPath(Number(this.value))
+    }
     slider.addEventListener("change", handleSliderChange)
 }
 
-function goThrough(timeInMillis : number){
-    let i = 0
-    let intervalID = 0
-    function showNext(){
-        if(i >= pathToSolution.length){
-            clearInterval(intervalID)
-            return
-        }
-        document.getElementById("Sudoku")?.replaceChildren(...getSudokuDOM(pathToSolution[i]).childNodes.values())
-        i++
-    }
 
-    intervalID = setInterval(() => showNext(),timeInMillis)
-}
