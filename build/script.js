@@ -106,7 +106,7 @@ onload = () => {
                 clearInterval(intervalID);
                 return;
             }
-            document.getElementById("Sudoku")?.replaceChildren(...getSudokuDOM(pathToSolution[i]).childNodes.values());
+            showSudokuOfPath(i);
             i++;
         }
         const timeInMillis = document.getElementById("AnimationSpeedSelector").valueAsNumber;

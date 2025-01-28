@@ -1,18 +1,32 @@
+:root{
+    --big-border : 3px;
+    --small-border : 1px;
+    --border-color : black;
+}
+
 #Sudoku{
     display: inline-block;
-    border: 0.5px solid black;
+    border: var(--small-border) solid var(--border-color);
+    border-top: var(--big-border) solid var(--border-color);
+    border-left: var(--big-border) solid var(--border-color);
 }
 .Row{
     display: block;
+}
+.Row:nth-child(3n){
+    border-bottom: calc(var(--big-border) - var(--small-border)) solid var(--border-color);
 }
 .Cell{
     vertical-align: top;
     display : inline-block;
     text-align: center;
-    border  : 0.5px solid black;
+    border  : calc(var(--small-border)/2) solid var(--border-color);
     width     : 5vh;
     height    : 5vh;
     font-size: 5vh;
+}
+.Cell:nth-child(3n){
+    border-right: var(--big-border) solid var(--border-color);
 }
 .Cell::-webkit-inner-spin-button,
 .Cell::-webkit-outer-spin-button{
