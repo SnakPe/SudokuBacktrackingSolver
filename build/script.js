@@ -25,7 +25,6 @@ function solve(grid) {
     }
     if (nextEmptyCellPosition == undefined)
         return true;
-    pathToSolution.push(grid);
     for (const value of values) {
         if (!checkNewValue(grid, value, nextEmptyCellPosition))
             continue;
@@ -128,6 +127,7 @@ onload = () => {
             columnIndex = 0;
             rowIndex++;
         });
+        pathToSolution.push(grid);
         if (!solve(grid))
             alert("Sudoku is not solvable");
         slider.max = (pathToSolution.length - 1).toString();
@@ -146,4 +146,17 @@ onload = () => {
         showSudokuOfPath(Number(this.value));
     }
     slider.addEventListener("change", handleSliderChange);
+};
+const debuggerHelper = {
+    showSudoku(sud) {
+        let s = "";
+        for (const row of sud) {
+            for (const cell of row) {
+                s = s + (cell != null ? cell : " ") + " ";
+            }
+            s = s + "\n";
+        }
+        console.log(s);
+        return s;
+    }
 };
